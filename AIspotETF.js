@@ -667,4 +667,3 @@ let conversationHistory = [
   { "role": "user", "content": "ok. above 0.85 confidence on approval or rejection u should be pretty confident and the text need to be clear about the fact the ETF SPOT BTC has been approved or rejected. no doubt on it from the text" },
   { "role": "system", "content": `Understood. For a confidence level above 0.85 in classifying a text as either approval or rejection of a BTC Spot ETF, the text must provide clear and unequivocal evidence of such a decision, without any ambiguity. I will apply this criterion in future assessments. Thank you for the clarification!` },
 ];
-

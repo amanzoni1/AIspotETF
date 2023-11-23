@@ -1,0 +1,19 @@
+{
+  "name": "aispotetf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "AIspotETF.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "nodemon AIspotETF.js",
+    "start": "node AIspotETF.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "openai": "^4.20.0",
+    "ws": "^8.14.2"
+  }
+}

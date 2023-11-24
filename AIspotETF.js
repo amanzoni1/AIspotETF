@@ -13,7 +13,6 @@ const httpsAgent = new https.Agent({ keepAlive: true });
 axios.defaults.httpAgent = httpAgent;
 axios.defaults.httpsAgent = httpsAgent;
 
-const ws = new WebSocket('wss://news.treeofalpha.com/ws');
 const openai = new OpenAI();
 
 const apiKey = process.env.BINANCE_API_KEY;
@@ -30,6 +29,7 @@ let priceObj = {};
 let infoObj = {};
 let orderTriggered = false; 
 let sellOrderTriggered = false;
+let reconnectionAttempts = 0;
 let socket;
 
 
@@ -59,9 +59,12 @@ reciveNews();
 async function reciveNews() {
   console.log('Connecting to WebSocket...');
 
+  const ws = new WebSocket('wss://news.treeofalpha.com/ws');
+
   ws.on('open', () => {
     console.log('Connection with MadNews opened');
     ws.send('login 842752f3f9b8271110aa50829407762f536b8a34e43661db7f3e3ff4cb8ca772');
+    reconnectionAttempts = 0;
   });
 
   ws.on('message', async (data) => { 
@@ -70,13 +73,24 @@ async function reciveNews() {
 
   ws.on('close', (code) => {
     console.log(`WebSocket connection closed with code ${code}`);
-    setTimeout(() => reciveNews(), 1000);
+    attemptReconnect();
   });
 
   ws.on('error', (e) => {
     console.log('WebSocket connection error: ' + e);
-    setTimeout(() => reciveNews(), 1000);
+    attemptReconnect();
   });
+}
+
+function attemptReconnect() {
+  if (reconnectionAttempts < 10) {
+    setTimeout(() => {
+      reciveNews();
+      reconnectionAttempts++;
+    }, Math.pow(2, reconnectionAttempts) * 1000); 
+  } else {
+    console.log('Max reconnection attempts reached.');
+  }
 }
 
 

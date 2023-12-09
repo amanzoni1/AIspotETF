@@ -23,13 +23,15 @@ const pOToken = process.env.PUSH_TOKEN;
 
 const symbol = 'BTCUSDT';
 const size = 500000;
-const fallbackPrice = 37000;
+const fallbackPrice = 44000;
 let myOpenPositions = {};
 let priceObj = {};
 let infoObj = {};
 let orderTriggered = false; 
 let sellOrderTriggered = false;
 let reconnectionAttempts = 0;
+let isConnected = false;
+let ws = null;
 let socket;
 
 
@@ -57,12 +59,17 @@ reciveNews();
 
 //RECIVE MESSAGE FROM THE SOCKET
 async function reciveNews() {
-  console.log('Connecting to WebSocket...');
+  if (isConnected || ws) {
+    console.log("Connection already established or in progress.");
+    return;
+  }
 
-  const ws = new WebSocket('wss://news.treeofalpha.com/ws');
+  console.log('Connecting to WebSocket...');
+  isConnected = true;
+  ws = new WebSocket('wss://news.treeofalpha.com/ws');
 
   ws.on('open', () => {
-    console.log('Connection with MadNews opened');
+    console.log('Connection with TreeNews opened');
     ws.send('login 842752f3f9b8271110aa50829407762f536b8a34e43661db7f3e3ff4cb8ca772');
     reconnectionAttempts = 0;
   });
@@ -73,17 +80,19 @@ async function reciveNews() {
 
   ws.on('close', (code) => {
     console.log(`WebSocket connection closed with code ${code}`);
+    isConnected = false;
+    ws = null;
     attemptReconnect();
   });
 
   ws.on('error', (e) => {
     console.log('WebSocket connection error: ' + e);
-    attemptReconnect();
   });
 }
 
+
 function attemptReconnect() {
-  if (reconnectionAttempts < 10) {
+  if (reconnectionAttempts < 20) {
     setTimeout(() => {
       reciveNews();
       reconnectionAttempts++;
@@ -474,7 +483,7 @@ async function setInfoObj() {
   
 
 // SEND NOTIFICATION FOR EVERYTHING HAPPEN
-async function sendNotification(user, token, message, priority = 0, title = "ETF RESPONSE!!") {
+async function sendNotification(user, token, message, priority = 0, title = "(AI) ETF RESPONSE!!") {
     const url = 'https://api.pushover.net/1/messages.json';
   
     const params = {

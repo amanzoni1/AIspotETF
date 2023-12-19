@@ -22,7 +22,7 @@ const pOUser = process.env.PUSH_USER_ID;
 const pOToken = process.env.PUSH_TOKEN;
 
 const symbol = 'BTCUSDT';
-const size = 700000;
+const size = 800000;
 const fallbackPrice = 43000;
 let myOpenPositions = {};
 let priceObj = {};
@@ -165,7 +165,7 @@ async function getInterpretation(text) {
       
     conversationHistory.push({ "role": "system", "content": aiResponse });
 
-    if (responseJson.classification === "approval" && responseJson.confidence >= 0.85) {
+    if (responseJson.classification === "approval" && responseJson.confidence > 0.85) {
       if (orderTriggered) {
         return JSON.stringify({ skipped: true, reason: "Order already triggered" });
       }
@@ -184,7 +184,7 @@ async function getInterpretation(text) {
       }
     }
 
-    if (responseJson.classification === "rejection" && responseJson.confidence >= 0.85) {
+    if (responseJson.classification === "rejection" && responseJson.confidence > 0.85) {
       if (sellOrderTriggered) {
         return JSON.stringify({ skipped: true, reason: "Sell order already triggered" });
       }

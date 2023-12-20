@@ -250,7 +250,7 @@ async function createOrder(paramsSide, symbol, quantity) {
     const order = await queryOrders(response.data.symbol, response.data.orderId);
 
     const timestampSL = Date.now();
-    const formattedStPrice = formatPrice( orderParams.side === 'BUY' ? (parseFloat(order.avgPrice * 0.98)) : (parseFloat(order.avgPrice * 1.02)), orderParams.symbol)
+    const formattedStPrice = formatPrice( orderParams.side === 'BUY' ? (parseFloat(order.avgPrice * 0.985)) : (parseFloat(order.avgPrice * 1.015)), orderParams.symbol)
     const stopMarketOrderParams = {
       symbol: orderParams.symbol,
       type: 'STOP_MARKET',

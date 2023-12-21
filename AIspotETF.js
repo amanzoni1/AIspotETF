@@ -23,7 +23,7 @@ const pOToken = process.env.PUSH_TOKEN;
 
 const symbol = 'BTCUSDT';
 const size = 800000;
-const fallbackPrice = 43000;
+const fallbackPrice = 45000;
 let myOpenPositions = {};
 let priceObj = {};
 let infoObj = {};
@@ -116,7 +116,6 @@ async function processMessage(data) {
       textToInterpret = message.title;
       sender = message.source;  
     } else {
-      //console.log(`Message ignored.`);
       return; 
     }
 
@@ -142,7 +141,11 @@ async function processMessage(data) {
   }
 }
 
-
+/*
+const currentTime = Date.now()
+const textpro = `{"title":" Notice of Designation of a Longer Period for Commission Action ona Proposed Rule Change to List and Trade Shares of the Hashdex Bitcoin Futures ETFunder NYSE Arca Rule 8.500-E (Trust Units)On September 22, 20","source":"Bloomberg","url":"https://news.treeofalpha.com/?v=551647991204.0009","time":${currentTime},"symbols":[],"en":"DOJ to Announce Binance Settlement in Press Conference Today","_id":"1700581595770DtABSiPCT","suggestions":[{"found":["Binance"],"coin":"BNB","symbols":[{"exchange":"binance-futures","symbol":"BNBUSDT"},{"exchange":"binance","symbol":"BNBUSDT"},{"exchange":"binance","symbol":"BNBBTC"},{"exchange":"binance","symbol":"BNBBUSD"},{"exchange":"binance","symbol":"BNBETH"},{"exchange":"bybit-perps","symbol":"BNBUSDT"}]}],"likes":2,"dislikes":1}`;
+setTimeout(() => {processMessage(textpro), 3000})
+*/
 
 
 
@@ -543,124 +546,107 @@ let conversationHistory = [
   { "role": "system", "content": `Yes, I'm ready. Please provide the text, and I'll interpret it for you to determine if it affirms a BTC (Bitcoin) Spot ETF (Exchange-Traded Fund) approval.` },
   { "role": "user", "content": `Whether to Approve or Disapprove a Proposed Rule Change, as Modified by Amendment No. 2,to List and TradeShares of the Wise OriginBitcoin Trustunder BZX Rule 14.11(e)(4), Commodity-Based Trust SharesOn June 30,` },
   { "role": "system", "content": `Based on the text you've provided, it appears to be a statement or a heading related to the decision on whether to approve or disapprove a proposed rule change for listing and trading shares of the Wise Origin Bitcoin Trust under a specific rule (BZX Rule 14.11(e)(4), which pertains to Commodity-Based Trust Shares). However, this text alone does not indicate whether the BTC Spot ETF has been approved or not. It merely states that there is a decision to be made regarding the approval or disapproval of a proposed rule change. For a definitive answer on the approval status, additional information or the conclusion of this statement would be necessary.` },
-  { "role": "user", "content": `good. since now the answer need to be a JSON obj, with some classification first (which 4 possibility: text suggest approval, rejection, delayed of the decision or text is not related(approve, reject, delay, other))  a confidence rate between 0 and 1 that show how confident u are that the text means approval denial, delay or it talk about other stuff, and a very short explanation.` },
+  { "role": "user", "content": `good. since now the answer need to be a JSON obj, with some classification first (which 4 possibility: text suggest approval, rejection, delayed of the decision or text is not related(approve, reject, delay, other)) and a confidence rate between 0 and 1 that show how confident u are that the text means approval denial, delay or it talk about other stuff.` },
   { "role": "system", "content": `{
     "classification": "delay",
-    "confidence": 0.7,
-    "explanation": "The text indicates a pending decision on the approval or disapproval of a BTC Spot ETF, suggesting a delay rather than a final outcome."
+    "confidence": 0.7
   }
   ` },
   { "role": "user", "content": `Possible Bitcoin ETF Delay: ; Notice of Designation of a Longer Period for Commission Action ona Proposed Rule Change to List and Trade Shares of the Hashdex Bitcoin Futures ETFunder NYSE Arca Rule 8.500-E (Trust Units)On September 22, 20
   https://www.sec.gov/files/rules/sro/nysearca/2023/34-98947.pdf` },
   { "role": "system", "content": `{
     "classification": "delay",
-    "confidence": 0.85,
-    "explanation": "The text explicitly mentions a 'longer period for Commission Action' regarding the proposed rule change for the Hashdex Bitcoin Futures ETF, indicating a delay in the decision-making process."
+    "confidence": 0.85
   }
   ` },
   { "role": "user", "content": `GMT: Introducing the “FSL Legacy Drop”: A Symphony of Fitness, Web3, and Gaming` },
   { "role": "system", "content": `{
     "classification": "other",
-    "confidence": 0.9,
-    "explanation": "The text references a new introduction in the realm of fitness, Web3, and gaming, not directly related to BTC Spot ETF approval or rejection."
+    "confidence": 0.9
   }
   ` },
   { "role": "user", "content": `Organizations; Cboe BZX Exchange, Inc.; Notice of Filing of a Proposed Rule Change to List and Trade Shares of the Invesco Galaxy Ethereum ETF under BZX Rule 14.11(e)(4), Commodity-Based Trust Shares Pursuant` },
   { "role": "system", "content": `{
     "classification": "other",
-    "confidence": 0.8,
-    "explanation": "The text is about a filing for a proposed rule change related to an Ethereum ETF, not directly concerning a BTC Spot ETF approval, rejection, or delay."
+    "confidence": 0.8
   }
   ` },
   { "role": "user", "content": `JUST IN: 🇺🇸SEC Delays Blackrock Spot #Bitcoin ETF Decision -- Again` },
   { "role": "system", "content": `{
     "classification": "delay",
-    "confidence": 0.95,
-    "explanation": "The text clearly states that the SEC has delayed the decision on the Blackrock Spot Bitcoin ETF, indicating a postponement in the approval process."
+    "confidence": 0.95
   }
   ` },
   { "role": "user", "content": `REPORTS BLACKROCK SPOT ETF IS APPROVED FALSE` },
   { "role": "system", "content": `{
     "classification": "rejection",
-    "confidence": 0.95,
-    "explanation": "The text explicitly states that reports of the Blackrock Spot ETF being approved are false, indicating a rejection or non-approval."
+    "confidence": 0.95
   }
   ` },
   { "role": "user", "content": `US SECURITIES AND EXCHANGE COMMISSION WILL NOT BE APPEALING COURT DECISION ON GRAYSCALE BITCOIN ETF -SOURCE FAMILIAR - RTRS` },
   { "role": "system", "content": `{
     "classification": "other",
-    "confidence": 0.85,
-    "explanation": "This text indicates the SEC's decision not to appeal a court decision regarding Grayscale Bitcoin ETF. It doesn't directly affirm approval, rejection, or delay of a BTC Spot ETF."
+    "confidence": 0.85
   }
   ` },
   { "role": "user", "content": `SEC Reviews Final Decision on Highly Anticipated Bitcoin Spot ETF Amidst Mixed Reactions.` },
   { "role": "system", "content": `{
     "classification": "delay",
-    "confidence": 0.75,
-    "explanation": "The text suggests an ongoing review process for a Bitcoin Spot ETF by the SEC, indicating a delay in reaching a final decision."
+    "confidence": 0.75
   }
   ` },
   { "role": "user", "content": `21SHARES & ARK FILED AN UPDATED VERSION OF ITS SPOT BITCOIN ETF S-1 APPLICATION` },
   { "role": "system", "content": `{
     "classification": "delay",
-    "confidence": 0.7,
-    "explanation": "Filing an updated version of a Spot Bitcoin ETF application suggests ongoing process and potential delays, rather than a final decision of approval or rejection."
+    "confidence": 0.7
   }
   ` },
   { "role": "user", "content": `SEC APPROVES BLACKROCK BTC SPOT ETF` },
   { "role": "system", "content": `{
     "classification": "approval",
-    "confidence": 0.95,
-    "explanation": "The text clearly states that the SEC has approved the Blackrock BTC Spot ETF, directly indicating an approval."
+    "confidence": 0.95
   }
   ` },
   { "role": "user", "content": `ZIL: How Zilliqa will power the fan loyalty revolution ` },
   { "role": "system", "content": `{
     "classification": "other",
-    "confidence": 0.9,
-    "explanation": "This text discusses Zilliqa's role in revolutionizing fan loyalty, unrelated to the approval, rejection, or delay of a BTC Spot ETF."
+    "confidence": 0.9
   }
   ` },
   { "role": "user", "content": `ARK 21SHARES BITCOIN ETF - SHARES ARE EXPECTED TO BE LISTED FOR TRADING ON CBOE BZX EXCHANGE, INC UNDER THE TICKER SYMBOL ARKB - RTRS` },
   { "role": "system", "content": `{
     "classification": "approval",
-    "confidence": 0.9,
-    "explanation": "The text implies an approval as it mentions the expected listing of ARK 21Shares Bitcoin ETF shares for trading, which usually follows regulatory approval."
+    "confidence": 0.9
   }
   ` },
   { "role": "user", "content": `here the etf is not sure, is just an hypotetical situation. i would like u to have lower confidence there` },
   { "role": "system", "content": `{
     "classification": "approval",
-    "confidence": 0.6,
-    "explanation": "While the text suggests an anticipated listing of ARK 21Shares Bitcoin ETF, the context of a hypothetical situation lowers the confidence in confirming this as a definite approval."
+    "confidence": 0.6
   }
   ` },
   { "role": "user", "content": ` Update: @ARKInvest just filed another amended prospectus for their spot #bitcoin ETF. Likely means things are likely still moving with SEC conversations. https://t.co/Of2S1pONDc` },
   { "role": "system", "content": `{
     "classification": "delay",
-    "confidence": 0.7,
-    "explanation": "The filing of an amended prospectus for a spot Bitcoin ETF by ARKInvest suggests ongoing discussions with the SEC, indicating a continued process rather than a final decision."
+    "confidence": 0.7
   }
   ` },
   { "role": "user", "content": `Breaking News: The U.S. Securities and Exchange Commission (SEC) has granted approval for the first Bitcoin Spot ETF, set to be listed on NASDAQ with immediate effect.` },
   { "role": "system", "content": `{
     "classification": "approval",
-    "confidence": 0.95,
-    "explanation": "The text explicitly states that the SEC has approved the first Bitcoin Spot ETF for immediate listing on NASDAQ, clearly indicating an approval."
+    "confidence": 0.95
   }
   ` },
   { "role": "user", "content": `SEC Officially Approves Grayscale's Bitcoin Spot ETF, Allowing Trading to Commence on the New York Stock Exchange Under the Ticker GBTC` },
   { "role": "system", "content": `{
     "classification": "approval",
-    "confidence": 0.95,
-    "explanation": "This text directly states that the SEC has officially approved Grayscale's Bitcoin Spot ETF, with trading set to commence on the New York Stock Exchange under the ticker GBTC."
+    "confidence": 0.95
   }
   ` },
   { "role": "user", "content": `ARK 21SHARES BITCOIN ETF - SHARES ARE EXPECTED TO BE LISTED FOR TRADING ON CBOE BZX EXCHANGE, INC UNDER THE TICKER SYMBOL ARKB - RTRS` },
   { "role": "system", "content": `{
     "classification": "other",
-    "confidence": 0.6,
-    "explanation": "The text indicates an expectation for ARK 21Shares Bitcoin ETF shares to be listed, but without clear confirmation of SEC approval, it remains speculative."
+    "confidence": 0.6
   }
   ` },
   { "role": "user", "content": `why now other and before it regarded approval?` },
@@ -674,8 +660,7 @@ let conversationHistory = [
   Copy code
   {
     "classification": "approval",
-    "confidence": 0.6,
-    "explanation": "The expectation of listing on an exchange suggests a progression towards approval, but without explicit regulatory confirmation, this remains speculative."
+    "confidence": 0.6
   }
   This classification acknowledges the potential implication of approval while also considering the lack of direct confirmation, resulting in a lower confidence score.` },
   { "role": "user", "content": `great!
@@ -683,8 +668,7 @@ let conversationHistory = [
   ` },
   { "role": "system", "content": `{
     "classification": "other",
-    "confidence": 0.95,
-    "explanation": "The text discusses stock market trends in major Gulf markets with a focus on upcoming Fed minutes, which is unrelated to any BTC Spot ETF decisions."
+    "confidence": 0.95
   }
   ` },
   { "role": "user", "content": "ok. above 0.85 confidence on approval or rejection u should be pretty confident and the text need to be clear about the fact the ETF SPOT BTC has been approved or rejected. no doubt on it from the text" },

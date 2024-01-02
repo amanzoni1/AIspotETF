@@ -22,7 +22,7 @@ const pOUser = process.env.PUSH_USER_ID;
 const pOToken = process.env.PUSH_TOKEN;
 
 const symbol = 'BTCUSDT';
-const size = 800000;
+const size = 1000000;
 const fallbackPrice = 45000;
 let myOpenPositions = {};
 let priceObj = {};
@@ -175,7 +175,7 @@ async function getInterpretation(text) {
       orderTriggered = true;
       const latestPrice = priceObj.hasOwnProperty('BTCUSDT') && priceObj['BTCUSDT'].price > 0 ? priceObj['BTCUSDT'].price : fallbackPrice;
         
-      if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount > 200000) {
+      if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount > 300000) {
         return JSON.stringify({ skipped: true, reason: "Already have a large position in BTCUSDT, not creating a new order." });
       } else {
         const quantity = size / latestPrice; 
@@ -194,7 +194,7 @@ async function getInterpretation(text) {
       sellOrderTriggered = true;
       const latestPrice = priceObj.hasOwnProperty('BTCUSDT') && priceObj['BTCUSDT'].price > 0 ? priceObj['BTCUSDT'].price : fallbackPrice;
         
-      if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount < 200000) {
+      if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount < 300000) {
         return JSON.stringify({ skipped: true, reason: "Already have a large position in BTCUSDT, not creating a new order." });
       } else {
         const quantity = size / latestPrice; 

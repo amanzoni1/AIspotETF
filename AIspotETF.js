@@ -22,8 +22,8 @@ const pOUser = process.env.PUSH_USER_ID;
 const pOToken = process.env.PUSH_TOKEN;
 
 const symbol = 'BTCUSDT';
-const size = 1000000;
 const fallbackPrice = 45000;
+let size = 1000000;
 let myOpenPositions = {};
 let priceObj = {};
 let infoObj = {};
@@ -148,16 +148,19 @@ async function processMessage(data) {
   }
 }
 
+
 /*
 const currentTime = Date.now()
-const textpro = `{"title":" Notice of Designation of a Longer Period for Commission Action ona Proposed Rule Change to List and Trade Shares of the Hashdex Bitcoin Futures ETFunder NYSE Arca Rule 8.500-E (Trust Units)On September 22, 20","source":"Bloomberg","url":"https://news.treeofalpha.com/?v=551647991204.0009","time":${currentTime},"symbols":[],"en":"DOJ to Announce Binance Settlement in Press Conference Today","_id":"1700581595770DtABSiPCT","suggestions":[{"found":["Binance"],"coin":"BNB","symbols":[{"exchange":"binance-futures","symbol":"BNBUSDT"},{"exchange":"binance","symbol":"BNBUSDT"},{"exchange":"binance","symbol":"BNBBTC"},{"exchange":"binance","symbol":"BNBBUSD"},{"exchange":"binance","symbol":"BNBETH"},{"exchange":"bybit-perps","symbol":"BNBUSDT"}]}],"likes":2,"dislikes":1}`;
-setTimeout(() => {processMessage(textpro), 3000})
+const textpro = `{"title":"BTC SPOT ETF HAS BEEN REJECTED","source":"Bloomberg","url":"https://news.treeofalpha.com/?v=551647991204.0009","time":${currentTime},"symbols":[],"en":"DOJ to Announce Binance Settlement in Press Conference Today","_id":"1700581595770DtABSiPCT","suggestions":[{"found":["Binance"],"coin":"BNB","symbols":[{"exchange":"binance-futures","symbol":"BNBUSDT"},{"exchange":"binance","symbol":"BNBUSDT"},{"exchange":"binance","symbol":"BNBBTC"},{"exchange":"binance","symbol":"BNBBUSD"},{"exchange":"binance","symbol":"BNBETH"},{"exchange":"bybit-perps","symbol":"BNBUSDT"}]}],"likes":2,"dislikes":1}`;
+setTimeout(() => {
+  processMessage(textpro);
+}, 15000); 
 */
-
 
 
 //GPT INTERPRETATION
 async function getInterpretation(text) {
+  let latestPrice;
   if (typeof text !== 'string') {
     return JSON.stringify({ error: true, reason: "Input is not a string" });
   }
@@ -180,14 +183,29 @@ async function getInterpretation(text) {
         return JSON.stringify({ skipped: true, reason: "Order already triggered" });
       }
       orderTriggered = true;
-      const latestPrice = priceObj.hasOwnProperty('BTCUSDT') && priceObj['BTCUSDT'].price > 0 ? priceObj['BTCUSDT'].price : fallbackPrice;
-        
-      if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount > 300000) {
+
+      if (priceObj.hasOwnProperty('BTCUSDT') && priceObj['BTCUSDT'].price.length > 5) {
+        latestPrice = priceObj['BTCUSDT'].price[0];
+        const price5SecAgo = priceObj['BTCUSDT'].price[5]; 
+        const priceChangeRatio = Math.abs((latestPrice - price5SecAgo) / price5SecAgo);
+
+        if (priceChangeRatio < 0.035) { 
+          size *= 1;
+        } else if (priceChangeRatio < 0.07) {
+          size *= 0.5;
+        } else if (priceChangeRatio < 0.2) {
+          size *= 0.01;
+        }
+      } else {
+        latestPrice = fallbackPrice; 
+      }
+
+      if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount > 200000) {
         return JSON.stringify({ skipped: true, reason: "Already have a large position in BTCUSDT, not creating a new order." });
       } else {
         const quantity = size / latestPrice; 
         await createOrder("BUY", symbol, quantity);
-        console.log(symbol, quantity, latestPrice)
+        console.log(`Symbol: ${symbol}, Size: ${size}, Quantity: ${quantity}, Latest Price: ${latestPrice}`);
         const message = `BTC SPOT ETF has been approved and an order created for ${quantity} BTC!`;
         sendNotification(pOUser, pOToken, message, 1);
         console.log(message);
@@ -199,14 +217,29 @@ async function getInterpretation(text) {
         return JSON.stringify({ skipped: true, reason: "Sell order already triggered" });
       }
       sellOrderTriggered = true;
-      const latestPrice = priceObj.hasOwnProperty('BTCUSDT') && priceObj['BTCUSDT'].price > 0 ? priceObj['BTCUSDT'].price : fallbackPrice;
-        
-      if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount < 300000) {
+
+      if (priceObj.hasOwnProperty('BTCUSDT') && priceObj['BTCUSDT'].price.length > 5) {
+        latestPrice = priceObj['BTCUSDT'].price[0];
+        const price5SecAgo = priceObj['BTCUSDT'].price[5]; 
+        const priceChangeRatio = Math.abs((latestPrice - price5SecAgo) / price5SecAgo);
+
+        if (priceChangeRatio < 0.035) { 
+          size *= 1.2;
+        } else if (priceChangeRatio < 0.07) {
+          size *= 0.6;
+        } else if (priceChangeRatio < 0.2) {
+          size *= 0.01;
+        }
+      } else {
+        latestPrice = fallbackPrice; 
+      }
+
+      if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount < (-200000)) {
         return JSON.stringify({ skipped: true, reason: "Already have a large position in BTCUSDT, not creating a new order." });
       } else {
         const quantity = size / latestPrice; 
         await createOrder("SELL", symbol, quantity);
-        console.log(symbol, quantity, latestPrice)
+        console.log(`Symbol: ${symbol}, Size: ${size}, Quantity: ${quantity}, Latest Price: ${latestPrice}`);
         const message = `BTC SPOT ETF has been rejected and an order created for ${quantity} BTC!`;
         sendNotification(pOUser, pOToken, message, 1);
         console.log(message);
@@ -395,27 +428,34 @@ function setPriceObj() {
   const streamName = `${symbol.toLowerCase()}@ticker`;
 
   if (socket) {
-      socket.removeAllListeners('message');
-      socket.removeAllListeners('close');
-      socket.removeAllListeners('error');
-      socket.close();  
+    socket.removeAllListeners('message');
+    socket.removeAllListeners('close');
+    socket.removeAllListeners('error');
+    socket.close();  
   }
 
   socket = new WebSocket(`wss://fstream.binance.com/ws/${streamName}`);
+
   socket.on('message', (data) => {
-      const priceData = JSON.parse(data);
-      const price = parseFloat(priceData.c);
-      priceObj[symbol] = { price: price };
+    const priceData = JSON.parse(data);
+    const price = parseFloat(priceData.c);
+    if (!priceObj.hasOwnProperty(symbol)) {
+      priceObj[symbol] = { price: [price] }; 
+    } else {
+      priceObj[symbol].price = priceObj[symbol].price.length < 10 ? [price, ...priceObj[symbol].price] : [price, ...priceObj[symbol].price.slice(0, -1)];
+    }
   });
+
   socket.on('close', (code) => {
-      console.log(`WebSocket connection closed with code ${code}`);
-      setTimeout(() => setPriceObj(), 1000);
+    console.log(`WebSocket connection closed with code ${code}`);
+    setTimeout(() => setPriceObj(), 1000);
   });
+
   socket.on('error', (e) => {
-      console.log('WebSocket connection error: ' + e);
-      setTimeout(() => setPriceObj(), 1000);
+    console.log('WebSocket connection error: ' + e);
   });
 }
+
 
 
 //Create an object with the orders filters

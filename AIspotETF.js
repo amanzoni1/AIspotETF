@@ -189,15 +189,16 @@ async function getInterpretation(text) {
         const price5SecAgo = priceObj['BTCUSDT'].price[5]; 
         const priceChangeRatio = Math.abs((latestPrice - price5SecAgo) / price5SecAgo);
 
-        if (priceChangeRatio < 0.035) { 
-          size *= 1;
-        } else if (priceChangeRatio < 0.07) {
-          size *= 0.5;
-        } else if (priceChangeRatio < 0.2) {
+        if (priceChangeRatio < 0.02) { 
+          size *= 0.6;
+        } else if (priceChangeRatio < 0.04) {
+          size *= 0.25;
+        } else if (priceChangeRatio < 0.1) {
           size *= 0.01;
         }
       } else {
-        latestPrice = fallbackPrice; 
+        latestPrice = fallbackPrice;
+        size *= 0.4;
       }
 
       if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount > 200000) {
@@ -223,15 +224,16 @@ async function getInterpretation(text) {
         const price5SecAgo = priceObj['BTCUSDT'].price[5]; 
         const priceChangeRatio = Math.abs((latestPrice - price5SecAgo) / price5SecAgo);
 
-        if (priceChangeRatio < 0.035) { 
+        if (priceChangeRatio < 0.03) { 
           size *= 1.2;
-        } else if (priceChangeRatio < 0.07) {
-          size *= 0.6;
+        } else if (priceChangeRatio < 0.065) {
+          size *= 0.8;
         } else if (priceChangeRatio < 0.2) {
           size *= 0.01;
         }
       } else {
-        latestPrice = fallbackPrice; 
+        latestPrice = fallbackPrice;
+        size *= 0.7; 
       }
 
       if (myOpenPositions.hasOwnProperty('BTCUSDT') && myOpenPositions['BTCUSDT'].amount < (-200000)) {
